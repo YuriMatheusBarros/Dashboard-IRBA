@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard Irba - Hospital IBR</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f0f4f8; /* Cor de fundo principal inspirada no site IBR */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 1.5rem;
+            box-sizing: border-box;
+        }
+        .container {
+            width: 100%;
+            max-width: 960px;
+            background-color: #ffffff;
+            border-radius: 1.5rem;
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+            padding: 2.5rem;
+            box-sizing: border-box;
+        }
+        .hidden {
+            display: none !important;
+        }
+        /* Definindo as cores primárias do IBR como variáveis para fácil customização */
+        :root {
+            --ibr-blue: #4381cb; /* Azul escuro do logo */
+            --ibr-green: #00a99d; /* Verde dos detalhes */
+        }
+    </style>
+</head>
+<body class="bg-gray-100">
+
+    <!-- Tela de Login -->
+    <div id="login-view" class="container">
+        <div class="flex flex-col items-center justify-center p-8">
+            <img src="https://cdn-icons-png.flaticon.com/512/1626/1626629.png" onerror="this.onerror=null;this.src='https://placehold.co/80x80/ffffff/003d73?text=IBR';" alt="Logo Irba" class="w-20 h-20 rounded-full mb-6 border-2 border-sky-100">
+            <h2 class="text-3xl font-bold text-sky-800 mb-6">Acesso ao Dashboard Irba</h2>
+            <div class="w-full max-w-sm">
+                <input type="text" id="login-username" class="w-full px-4 py-3 mb-4 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-sky-600" placeholder="Usuário">
+                <input type="password" id="login-password" class="w-full px-4 py-3 mb-4 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-sky-600" placeholder="Senha">
+                <select id="login-sector" class="w-full px-4 py-3 mb-6 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-sky-600">
+                    <option value="">Selecione seu Setor</option>
+                    <option value="admin">Administração</option>
+                    <option value="medical">Equipe Médica</option>
+                    <option value="reception">Recepção</option>
+                </select>
+                <p id="login-error" class="text-red-600 text-sm mb-4 text-center hidden">Credenciais inválidas ou setor incorreto.</p>
+                <button id="login-btn" class="w-full bg-sky-800 text-white py-3 rounded-lg font-semibold hover:bg-sky-900 transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-sky-600 focus:ring-offset-2">Entrar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Dashboard View -->
+    <div id="dashboard-view" class="container hidden">
+        <!-- Cabeçalho do Dashboard -->
+        <div class="flex items-center justify-between mb-8 pb-4 border-b border-gray-200">
+            <div class="flex items-center">
+                <img src="https://cdn-icons-png.flaticon.com/512/1626/1626629.png" onerror="this.onerror=null;this.src='https://placehold.co/64x64/ffffff/003d73?text=IBR';" alt="Logo Irba" class="w-16 h-16 rounded-full mr-4 border-2 border-sky-100">
+                <div>
+                    <h1 class="text-3xl font-bold text-sky-800">Dashboard Irba</h1>
+                    <p class="text-md text-gray-600">Visão Geral de Atendimentos - Hospital IBR</p>
+                </div>
+            </div>
+            <div class="text-right">
+                <p class="text-sm text-gray-500">Última atualização:</p>
+                <p id="last-updated" class="text-md font-semibold text-gray-700">Carregando...</p>
+                <button id="logout-btn" class="mt-2 bg-gray-200 text-gray-700 px-3 py-1 rounded-full text-sm hover:bg-gray-300 transition-colors duration-200">Sair</button>
+            </div>
+        </div>
+
+        <!-- Seção de Métricas Principais -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
+            <div class="bg-blue-50 p-6 rounded-xl shadow-sm border border-blue-200">
+                <h3 class="text-lg font-semibold text-blue-800 mb-2">Total de Atendimentos</h3>
+                <p id="total-services" class="text-4xl font-extrabold text-blue-900">0</p>
+                <p class="text-sm text-blue-600 mt-1">Interações com o chatbot</p>
+            </div>
+            <div class="bg-green-50 p-6 rounded-xl shadow-sm border border-green-200">
+                <h3 class="text-lg font-semibold text-green-800 mb-2">Agendamentos Realizados</h3>
+                <p id="total-appointments" class="text-4xl font-extrabold text-green-900">0</p>
+                <p class="text-sm text-green-600 mt-1">Agendamentos concluídos com a Irba</p>
+            </div>
+            <div class="bg-purple-50 p-6 rounded-xl shadow-sm border border-purple-200">
+                <h3 class="text-lg font-semibold text-purple-800 mb-2">Benefícios Gerados (Est.)</h3>
+                <p id="estimated-benefits" class="text-4xl font-extrabold text-purple-900">0</p>
+                <p class="text-sm text-purple-600 mt-1">Impacto estimado por agendamento</p>
+            </div>
+        </div>
+
+        <!-- Seção de Dados Sensíveis (exemplo de privilégio) -->
+        <div id="sensitive-data-section" class="bg-red-50 border border-red-200 p-6 rounded-xl shadow-sm mt-8 hidden">
+            <h3 class="text-xl font-bold text-red-800 mb-3">Informações Sensíveis <span class="text-sm font-normal">(Apenas Admin)</span></h3>
+            <p class="text-red-700 leading-relaxed">Esta seção conteria dados mais detalhados e de acesso restrito, visíveis apenas para usuários com privilégios de administrador. Exemplos incluiriam uma lista completa de pacientes, dados demográficos aprofundados, relatórios financeiros ou logs de interações específicas.</p>
+            <p class="text-sm text-red-600 mt-3">Ex: Detalhes de CPF, histórico de agendamentos por paciente, auditoria de acessos.</p>
+        </div>
+        
+        <!-- Seção de Dados do Setor Médico (exemplo de privilégio) -->
+        <div id="medical-data-section" class="bg-yellow-50 border border-yellow-200 p-6 rounded-xl shadow-sm mt-8 hidden">
+            <h3 class="text-xl font-bold text-yellow-800 mb-3">Dados para Equipe Médica <span class="text-sm font-normal">(Apenas Médicos)</span></h3>
+            <p class="text-yellow-700 leading-relaxed">Esta seção exibiria informações relevantes para a equipe médica, como próximas consultas, especialidades mais procuradas, ou um resumo de casos recentes.</p>
+            <p class="text-sm text-yellow-600 mt-3">Ex: Próximos agendamentos por especialidade, fila de atendimento.</p>
+        </div>
+
+        <!-- Seção de Dados da Recepção (exemplo de privilégio) -->
+        <div id="reception-data-section" class="bg-green-50 border border-green-200 p-6 rounded-xl shadow-sm mt-8 hidden">
+            <h3 class="text-xl font-bold text-green-800 mb-3">Dados para Recepção <span class="text-sm font-normal">(Apenas Recepção)</span></h3>
+            <p class="text-green-700 leading-relaxed">Aqui seriam apresentados dados úteis para a equipe de recepção, como o número de check-ins do dia, horários de pico e informações de contato de pacientes para confirmação.</p>
+            <p class="text-sm text-green-600 mt-3">Ex: Pacientes aguardando, confirmações de agendamento, informações de contato.</p>
+        </div>
+    </div>
+
+<script type="module">
+    // --- FIREBASE IMPORTS ---
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+    import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+    import { getFirestore, doc, setDoc, updateDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+    // --- DOM ELEMENTS - LOGIN ---
+    const loginView = document.getElementById('login-view');
+    const loginUsernameInput = document.getElementById('login-username');
+    const loginPasswordInput = document.getElementById('login-password');
+    const loginSectorSelect = document.getElementById('login-sector');
+    const loginBtn = document.getElementById('login-btn');
+    const loginErrorEl = document.getElementById('login-error');
+
+    // --- DOM ELEMENTS - DASHBOARD ---
+    const dashboardView = document.getElementById('dashboard-view');
+    const totalServicesEl = document.getElementById('total-services');
+    const totalAppointmentsEl = document.getElementById('total-appointments');
+    const estimatedBenefitsEl = document.getElementById('estimated-benefits');
+    const sensitiveDataSection = document.getElementById('sensitive-data-section');
+    const medicalDataSection = document.getElementById('medical-data-section');
+    const receptionDataSection = document.getElementById('reception-data-section');
+    const lastUpdatedEl = document.getElementById('last-updated');
+    const logoutBtn = document.getElementById('logout-btn');
+
+    // --- FIREBASE GLOBALS ---
+    let app, db, auth, userId;
+    const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
+    const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : {};
+    const initialAuthToken = typeof __initial_auth_token !== 'undefined' ? __initial_auth_token : null;
+
+    // --- SIMULATED USER CREDENTIALS AND PRIVILEGES ---
+    const USERS = {
+        'admin@ibr.com': { password: 'adminpassword', sector: 'admin' },
+        'medical@ibr.com': { password: 'medicalpassword', sector: 'medical' },
+        'reception@ibr.com': { password: 'receptionpassword', sector: 'reception' },
+    };
+
+    let currentSector = null; // Stores the sector of the logged-in user
+
+    /** Inicializa o Firebase e a autenticação */
+    async function initFirebase() {
+        try {
+            app = initializeApp(firebaseConfig);
+            db = getFirestore(app);
+            auth = getAuth(app);
+
+            // Tenta autenticar com o token inicial ou anonimamente
+            if (initialAuthToken) {
+                await signInWithCustomToken(auth, initialAuthToken);
+            } else {
+                await signInAnonymously(auth);
+            }
+
+            onAuthStateChanged(auth, (user) => {
+                if (user) {
+                    userId = user.uid;
+                    console.log("Firebase Authenticated. User ID:", userId);
+                    // Não configuramos o listener do dashboard aqui, ele será configurado após o login bem-sucedido
+                } else {
+                    console.log("Firebase Not Authenticated or User Logged Out.");
+                }
+            });
+        } catch (error) {
+            console.error("Error initializing Firebase:", error);
+            displayLoginError("Erro ao iniciar Firebase. Tente novamente.");
+        }
+    }
+
+    /**
+     * Configura um listener em tempo real para as métricas do dashboard no Firestore.
+     */
+    function setupDashboardMetricsListener() {
+        if (!db) {
+            console.error("Firestore not initialized.");
+            return;
+        }
+        const globalMetricsRef = doc(db, 'artifacts', appId, 'public', 'data', 'dashboardMetrics', 'globalMetrics');
+        
+        onSnapshot(globalMetricsRef, (docSnap) => {
+            if (docSnap.exists()) {
+                const data = docSnap.data();
+                totalServicesEl.textContent = data.totalServices || 0;
+                totalAppointmentsEl.textContent = data.totalAppointments || 0;
+                estimatedBenefitsEl.textContent = data.estimatedBenefits || 0;
+                // Atualiza a data da última atualização
+                const now = new Date();
+                lastUpdatedEl.textContent = `${now.toLocaleDateString()} ${now.toLocaleTimeString()}`;
+            } else {
+                console.log("No dashboard metrics found. Initializing with zeros.");
+                setDoc(globalMetricsRef, {
+                    totalServices: 0,
+                    totalAppointments: 0,
+                    estimatedBenefits: 0
+                }, { merge: true }).catch(e => console.error("Error setting initial metrics:", e));
+            }
+        }, (error) => {
+            console.error("Error listening to dashboard metrics:", error);
+        });
+    }
+
+    /**
+     * Exibe a tela de login e esconde o dashboard.
+     */
+    function showLoginPage() {
+        dashboardView.classList.add('hidden');
+        loginView.classList.remove('hidden');
+        loginErrorEl.classList.add('hidden'); // Esconde erros anteriores
+        loginUsernameInput.value = '';
+        loginPasswordInput.value = '';
+        loginSectorSelect.value = '';
+        currentSector = null; // Limpa o setor logado
+        hideSectorSpecificSections(); // Esconde todas as seções específicas de setor
+    }
+
+    /**
+     * Exibe o dashboard e esconde a tela de login.
+     */
+    function showDashboardPage() {
+        loginView.classList.add('hidden');
+        dashboardView.classList.remove('hidden');
+        setupDashboardMetricsListener(); // Inicia o listener de métricas
+        updateDashboardViewForSector(); // Ajusta a visibilidade com base no setor
+    }
+
+    /**
+     * Exibe uma mensagem de erro na tela de login.
+     * @param {string} message - A mensagem de erro a ser exibida.
+     */
+    function displayLoginError(message) {
+        loginErrorEl.textContent = message;
+        loginErrorEl.classList.remove('hidden');
+    }
+
+    /**
+     * Esconde todas as seções do dashboard específicas de setor.
+     */
+    function hideSectorSpecificSections() {
+        sensitiveDataSection.classList.add('hidden');
+        medicalDataSection.classList.add('hidden');
+        receptionDataSection.classList.add('hidden');
+    }
+
+    /**
+     * Atualiza a visibilidade das seções do dashboard com base no setor atual.
+     */
+    function updateDashboardViewForSector() {
+        hideSectorSpecificSections(); // Esconde tudo primeiro
+
+        switch (currentSector) {
+            case 'admin':
+                sensitiveDataSection.classList.remove('hidden');
+                medicalDataSection.classList.remove('hidden'); // Admin pode ver tudo (exemplo)
+                receptionDataSection.classList.remove('hidden'); // Admin pode ver tudo (exemplo)
+                break;
+            case 'medical':
+                medicalDataSection.classList.remove('hidden');
+                break;
+            case 'reception':
+                receptionDataSection.classList.remove('hidden');
+                break;
+            default:
+                // Nenhum privilégio especial, apenas as métricas básicas
+                break;
+        }
+    }
+
+    // --- EVENT LISTENERS ---
+    loginBtn.addEventListener('click', () => {
+        const username = loginUsernameInput.value;
+        const password = loginPasswordInput.value;
+        const sector = loginSectorSelect.value;
+
+        const user = USERS[username];
+
+        if (user && user.password === password && user.sector === sector) {
+            currentSector = sector;
+            showDashboardPage();
+        } else {
+            displayLoginError("Usuário, senha ou setor inválidos.");
+        }
+    });
+
+    logoutBtn.addEventListener('click', () => {
+        showLoginPage();
+    });
+
+    // Inicia o Firebase e exibe a tela de login quando o DOM estiver carregado
+    document.addEventListener('DOMContentLoaded', async () => {
+        await initFirebase();
+        showLoginPage(); // Começa na tela de login
+    });
+</script>
+</body>
+</html>
